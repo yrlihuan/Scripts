@@ -1,9 +1,14 @@
 #! /usr/bin/env ruby
 
-# wait for system initialization to finish
-sleep 20
+def test_connect_ap
+  ap_addr = "192.168.1.1"
+  cmd = "ping -c 4 #{ap_addr}"
+  `#{cmd}`
+  $?.success?
+end
 
-while true
+
+def log_interface_state
   iwconfig_result = `iwconfig`
   wlan_list = `rfkill list`
 
@@ -15,26 +20,44 @@ while true
     f.puts("rfkill list:")
     f.puts(wlan_list)
   end
+end
 
-  lines = wlan_list.split("\n")
-  ind = 0
-  while ind + 2 < lines.length
-    # First line is like "0: phy0: Wireless LAN"
-    adapter_id = lines[ind].split(":")[0].to_i
+def bootstrap
+  # wait for system initialization to finish
+  sleep 60
 
-    # Second line is like "\tSoft blocked: no"
-    soft_blocked = lines[ind+1].end_with? "yes"
+  while true
+    wlan_list = `rfkill list`
+    lines = wlan_list.split("\n")
+    ind = 0
 
-    # Third line is like "\tHard blocked: no"
-    hard_blocked = lines[ind+2].end_with? "yes"
-
-    if true
-      cmd = "rfkill unblock all"
-      `#{cmd}`
+    unless test_connect_ap
+      log_interface_state
     end
 
-    ind += 3
-  end
+    while ind + 2 < lines.length
+      # First line is like "0: phy0: Wireless LAN"
+      adapter_id = lines[ind].split(":")[0].to_i
 
-  sleep 60
+      # Second line is like "\tSoft blocked: no"
+      soft_blocked = lines[ind+1].end_with? "yes"
+
+      # Third line is like "\tHard blocked: no"
+      hard_blocked = lines[ind+2].end_with? "yes"
+
+      if soft_blocked
+        cmd = "rfkill unblock all"
+        `#{cmd}`
+      end
+
+      ind += 3
+    end
+
+    sleep 600
+  end
 end
+
+if $PROGRAM_NAME == __FILE__
+  bootstrap
+end
+
