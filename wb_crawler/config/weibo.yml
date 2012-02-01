@@ -1,0 +1,5 @@
+development:
+  api_key: "3136366748"
+  api_secret: "63c27f40fd65de966cd66a8bd8d082e4"
+  database: "mysql://statusnet081:looamysqlroot@localhost/liuxin"
+  target_user: "2066785327"
