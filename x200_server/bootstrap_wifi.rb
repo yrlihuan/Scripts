@@ -28,6 +28,7 @@ def bootstrap
 
   while true
     wlan_list = `rfkill list`
+    puts wlan_list
     lines = wlan_list.split("\n")
     ind = 0
 
