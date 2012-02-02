@@ -34,6 +34,7 @@ DB.create_table? :wb_users do
   Integer :followers_count
   Integer :retweet_count, :default => 0
   Integer :comment_count, :default => 0
+  String :screen_name
   TrueClass :follower
 end
 
@@ -72,7 +73,8 @@ class WeiboCrawler
         comments = weibo_instance.comments(params)
         # HACK: sina only allows to retrieve less than 500 records per minute
         if page % 3 == 1 && page != 1
-          sleep(batch_start - Time.now + 60)
+          backoff_interval = batch_start - Time.now + 50
+          sleep(backoff_interval) if backoff_interval > 0
           batch_start = Time.now
         end
 
@@ -143,7 +145,7 @@ def update_comments
         user_db[:comment_count] += count
         table_users[:id=>id] = user_db
       else
-        table_users << {:id => id, :followers_count => user.followers_count, :follower => false, :comment_count => count}
+        table_users << {:id => id, :followers_count => user.followers_count, :follower => false, :comment_count => count, :screen_name => user.screen_name}
       end
     end
 
