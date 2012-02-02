@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: utf-8
 
 # hacks here: we don't want to add dependency on rails
 PROFILE = "liuxin"
@@ -64,6 +65,32 @@ class WeiboCrawler
     end
   end
 
+  def update_reposts(status_id)
+    page = 1
+    batch_start = Time.now
+    while true
+      puts "reposts: page #{page}"
+      params = {:id => status_id, :count => 200, :page => page}
+
+      begin
+        reposts = weibo_instance.repost_timeline(params)
+
+        page += 1
+      rescue Exception => e
+        puts e
+        sleep 30
+        next
+      end
+
+      updated = 0
+      reposts.each do |repost|
+        updated += yield repost
+      end
+
+      break if updated == 0
+    end
+  end
+
   def update_status_comments(status_id)
     page = 1
     batch_start = Time.now
@@ -101,6 +128,72 @@ class WeiboCrawler
     oauth = Weibo::OAuth.new(Weibo::Config.api_key, Weibo::Config.api_secret)
     oauth.authorize_from_access(token, secret)
     Weibo::Base.new(oauth)
+  end
+end
+
+def update_reposts
+  crawler = WeiboCrawler.new
+
+  table_statuses = DB[:wb_statuses]
+  table_users = DB[:wb_users]
+  status_ind = 0
+
+  table_statuses.each do |status|
+    next if status[:retweet]
+    max_id = status[:updated_retweet_max]
+    status_id = status[:id]
+    new_max = max_id
+
+    users = {}
+    total = 0
+
+    crawler.update_reposts(status_id) do |repost|
+      id = repost.id.to_i
+
+      if id < max_id
+        0
+      else
+        new_max = id if id > new_max
+        total += 1
+
+        user = repost.user
+        userid = user.id.to_i
+
+        ios_count = is_source_from_ios(repost.source) && 1 || 0
+        if users.key?(userid)
+          users[userid][0] += 1
+          users[userid][1] += ios_count
+        else
+          users[userid] = [1, ios_count, user]
+        end
+
+        1
+      end
+    end
+
+    users.each do |id, data|
+      count = data[0]
+      ios_count = data[1]
+      user = data[2]
+      user_db = table_users[:id=>id]
+      if user_db
+        user_db[:retweet_count] += count
+        user_db[:retweet_count_ios] += ios_count
+        table_users[:id=>id] = user_db
+      else
+        table_users << {:id => id,
+                        :followers_count => user.followers_count,
+                        :follower => false,
+                        :retweet_count => count,
+                        :retweet_count_ios => ios_count,
+                        :screen_name => user.screen_name}
+      end
+    end
+
+    table_statuses[:id=>status_id] = {:updated_retweet_max => new_max}
+
+    puts "retweets updated for #{status_id}(#{status_ind+=1}th). #{total} updated"
+
   end
 end
 
@@ -180,8 +273,16 @@ def update_user_timeline
   puts "update user timeline: #{updated}"
 end
 
+def is_source_from_ios(source)
+  # puts source unless source.include? "新浪微博"
+  return false if source.include? "新浪微博"
+  return true if source.include?("iPhone客户端") || source.include?("iPad客户端") || source.include?("Weico.iPhone版") || source.include?("微格iPhone客户端") || source.include?("微格iPad客户端")
+  return false
+end
+
 if $PROGRAM_NAME == __FILE__
-  #update_user_timeline
+  update_user_timeline
   #update_comments
+  update_reposts
 end
 
