@@ -1,13 +1,14 @@
 #!/usr/bin/env ruby
 
 # hacks here: we don't want to add dependency on rails
-PROFILE = "liuxin"
+PROFILE = "liuxin_test"
 class Rails
   def self.env
     PROFILE
   end
 end
 
+require "yaml"
 CONFIG = YAML.load_file('config/weibo.yml')[PROFILE]
 
 require "rubygems"

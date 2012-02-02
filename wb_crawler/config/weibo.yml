@@ -30,3 +30,18 @@ liuxin_test:
   api_secret: "d73a287ac8f0299cc3acd702b5fce8e5"
   database: "mysql://statusnet081:looamysqlroot@localhost/liuxin"
   target_user: "2066785327"
+  tokens:
+    - token: "7d8711b5cc1abd32c75917dd71284d56"
+      secret: "344675895aab82f6b15ee1b7e0fc306c"
+    - token: "e0df0c85ba853a0548e6d95550581464"
+      secret: "937b68552b0dd903de70f73dc04da69e"
+    - token: "07034d27c12139ee1827d5d64c957cc8"
+      secret: "4e2256f747c478dfdd0b051dc4ddfc5f"
+    - token: "fdb4bde234abcdf6f5f82b094849ac84"
+      secret: "3da65c25ae6e0ba7f34c46268e5b9450"
+    - token: "d21aaf5aa004a354f86e806e92de4d22"
+      secret: "a38436d40550f25726781223c3c16b77"
+    - token: "fee422708f9fe4375511f293389f1af5"
+      secret: "d7eb87da650970bcb4f0482e5e840cb0"
+
+
