@@ -1,11 +1,14 @@
 #!/usr/bin/env ruby
 
 # hacks here: we don't want to add dependency on rails
+PROFILE = "liuxin"
 class Rails
   def self.env
-    "development"
+    PROFILE
   end
 end
+
+CONFIG = YAML.load_file('config/weibo.yml')[PROFILE]
 
 require "rubygems"
 require "weibo"
@@ -14,7 +17,6 @@ require "./access_dispatcher"
 require "sequel"
 require "time"
 
-CONFIG = YAML.load_file('config/weibo.yml')['development']
 DB = Sequel.connect(CONFIG['database'])
 
 DB.create_table? :wb_statuses do
@@ -99,6 +101,5 @@ end
 
 if $PROGRAM_NAME == __FILE__
   update_user_timeline
-  update_followers
 end
 
