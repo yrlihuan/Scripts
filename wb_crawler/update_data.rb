@@ -44,7 +44,7 @@ class WeiboCrawler
   def update_user_timeline(user_id)
     max_id = -1
     while true
-      params = {:user_id => user_id, :count => 200}
+      params = {:user_id => user_id, :count => 50}
       if max_id > 0
         params[:max_id] = max_id - 1
       end
@@ -62,12 +62,26 @@ class WeiboCrawler
   end
 
   def update_status_comments(status_id)
-    page = 0
+    page = 1
+    batch_start = Time.now
     while true
-      page += 1
+      puts "comments: page #{page}"
       params = {:id => status_id, :count => 200, :page => page}
 
-      comments = weibo_instance.comments(params)
+      begin
+        comments = weibo_instance.comments(params)
+        # HACK: sina only allows to retrieve less than 500 records per minute
+        if page % 3 == 1 && page != 1
+          sleep(batch_start - Time.now + 60)
+          batch_start = Time.now
+        end
+
+        page += 1
+      rescue Exception => e
+        puts e
+        sleep 10
+        next
+      end
 
       updated = 0
       comments.each do |comment|
@@ -79,23 +93,10 @@ class WeiboCrawler
   end
 
   def weibo_instance
-    puts "send request!!"
     token, secret = AccessDispatcher.request_access
     oauth = Weibo::OAuth.new(Weibo::Config.api_key, Weibo::Config.api_secret)
     oauth.authorize_from_access(token, secret)
     Weibo::Base.new(oauth)
-  end
-end
-
-def update_user(user, follower)
-  table_users = DB[:wb_users]
-
-  id = user.id.to_i
-  if table_users.first(:id => id)
-    0
-  else
-    table_users.insert(:id => id, :screen_name => user.screen_name, :followers_count => user.followers_count, :follower => follower)
-    1
   end
 end
 
@@ -125,9 +126,9 @@ def update_comments
         user = comment.user
         userid = user.id.to_i
         if users.key?(userid)
-          users[id][0] += 1
+          users[userid][0] += 1
         else
-          users[id] = [1, user]
+          users[userid] = [1, user]
         end
 
         1
