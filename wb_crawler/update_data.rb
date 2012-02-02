@@ -75,7 +75,7 @@ class WeiboCrawler
         comments = weibo_instance.comments(params)
         # HACK: sina only allows to retrieve less than 500 records per minute
         if page % 3 == 1 && page != 1
-          backoff_interval = batch_start - Time.now + 50
+          backoff_interval = batch_start - Time.now + 60.5
           sleep(backoff_interval) if backoff_interval > 0
           batch_start = Time.now
         end
@@ -83,7 +83,7 @@ class WeiboCrawler
         page += 1
       rescue Exception => e
         puts e
-        sleep 10
+        sleep 5
         next
       end
 
@@ -109,6 +109,7 @@ def update_comments
 
   table_statuses = DB[:wb_statuses]
   table_users = DB[:wb_users]
+  status_ind = 0
 
   table_statuses.each do |status|
     max_id = status[:updated_comment_max]
@@ -153,9 +154,7 @@ def update_comments
 
     table_statuses[:id=>status_id] = {:updated_comment_max => new_max}
 
-    puts "comments updated for #{status_id}. #{total} updated"
-
-    break
+    puts "comments updated for #{status_id}(#{status_ind+=1}th). #{total} updated"
   end
 end
 
