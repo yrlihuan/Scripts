@@ -11,8 +11,9 @@ class AccessDispatcher
   def self.request_access
 
     now = Time.now
-    min_interval = 3600.0 / ACCESS_TOKENS.size / MAX_REQUEST_PER_ID_PER_HOUR * 1.2
+    min_interval = 3600.0 / ACCESS_TOKENS.size / MAX_REQUEST_PER_ID_PER_HOUR * 2
     request_interval = now - @@last_access
+    puts "interval min: #{min_interval}, actual: #{request_interval}"
     if request_interval < min_interval
       sleep(min_interval - request_interval)
     end
