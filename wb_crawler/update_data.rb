@@ -15,6 +15,7 @@ require "rubygems"
 require "weibo"
 require "oauth"
 require "./access_dispatcher"
+require "./weibo_ext"
 require "sequel"
 require "time"
 
@@ -33,6 +34,7 @@ DB.create_table? :wb_users do
   Bignum :id, :primary_key => true
   Integer :followers_count
   Integer :retweet_count, :default => 0
+  Integer :retweet_count_ios, :default => 0
   Integer :comment_count, :default => 0
   String :screen_name
   TrueClass :follower
@@ -180,7 +182,7 @@ def update_user_timeline
 end
 
 if $PROGRAM_NAME == __FILE__
-  update_user_timeline
-  update_comments
+  #update_user_timeline
+  #update_comments
 end
 
