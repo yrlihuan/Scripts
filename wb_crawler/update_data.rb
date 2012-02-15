@@ -68,9 +68,13 @@ class WeiboCrawler
   def update_reposts(status_id)
     page = 1
     batch_start = Time.now
+    max_id = 0
     while true
       puts "reposts: page #{page}"
       params = {:id => status_id, :count => 200, :page => page}
+      if max_id > 0
+        params[:max_id] = max_id
+      end
 
       begin
         reposts = weibo_instance.repost_timeline(params)
@@ -85,6 +89,10 @@ class WeiboCrawler
       updated = 0
       reposts.each do |repost|
         updated += yield repost
+
+        if max_id == 0
+          max_id = repost.id
+        end
       end
 
       break if updated == 0
@@ -110,7 +118,7 @@ class WeiboCrawler
         page += 1
       rescue Exception => e
         puts e
-        sleep 5
+        sleep 31
         next
       end
 
@@ -211,11 +219,14 @@ def update_comments
 
     users = {}
     total = 0
+    old = 0
 
     crawler.update_status_comments(status_id) do |comment|
       id = comment.id.to_i
 
       if id < max_id
+        # puts "#{id}, #{max_id}" if old == 0
+        old += 1
         0
       else
         new_max = id if id > new_max
@@ -281,7 +292,7 @@ def is_source_from_ios(source)
 end
 
 if $PROGRAM_NAME == __FILE__
-  update_user_timeline
+  #update_user_timeline
   #update_comments
   update_reposts
 end
