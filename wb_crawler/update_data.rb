@@ -139,6 +139,17 @@ class WeiboCrawler
   end
 end
 
+def get_retweeters(status_id)
+  crawler = WeiboCrawler.new
+
+  crawler.update_reposts(status_id) do |repost|
+    user = repost.user
+    puts "#{user.screen_name}\t#{user.followers_count}\t#{user.statuses_count}\t#{user.location}"
+
+    1
+  end
+end
+
 def update_reposts
   crawler = WeiboCrawler.new
 
@@ -294,6 +305,7 @@ end
 if $PROGRAM_NAME == __FILE__
   #update_user_timeline
   #update_comments
-  update_reposts
+  #update_reposts
+  get_retweeters("3412746022272885")
 end
 
