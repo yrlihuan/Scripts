@@ -2609,7 +2609,7 @@ if __name__ == "__main__":
 
     count += 1
     try:
-      s = urllib2.urlopen('http://www.baidu.com').read()
+      s = urllib2.urlopen(url).read()
       print "success: %s (%d/%d)" % (p, count, total)
     except:
       print "failed: %s (%d/%d)" % (p, count, total)
