@@ -50,14 +50,14 @@ if $PROGRAM_NAME == __FILE__
           failed += 1
         end
 
-        puts "success: #{p} (#{i}/#{total}) length: #{client.response.length} code: #{code}"
+        #puts "success: #{p} (#{i}/#{total}) length: #{client.response.length} code: #{code}"
         sleep(rand * 10)
         iter.next
       end
 
       http.errback do |client|
         failed += 1
-        puts "failed: #{p} (#{i}/#{total} code: #{client.response_header.status})"
+        #puts "failed: #{p} (#{i}/#{total} code: #{client.response_header.status})"
         sleep(rand * 2)
         iter.next
       end
