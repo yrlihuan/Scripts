@@ -24,7 +24,7 @@ if $PROGRAM_NAME == __FILE__
 
     print "#{Time.now} retrieving download url: ...  "
     cmd = %q{curl -s "http://app.91.com/Soft/iPhone/com.xingxinghui.game.musicguess-1.0.1-1.0.1.html" | grep "下载到电脑" | sed -n 's/^.*a href="\([^ ]*\)".*$/\1/p'}
-    path = `cmd`
+    path = `#{cmd}`
     while path.length < 10
       sleep(300)
       path = `#{cmd}`
