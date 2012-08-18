@@ -41,5 +41,5 @@ if $PROGRAM_NAME == __FILE__
     puts "#{Time.now} result: #{success} visits"
     sleep(60)
   end
-
+end
 
