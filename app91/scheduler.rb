@@ -34,7 +34,7 @@ if $PROGRAM_NAME == __FILE__
     puts "done!"
 
     print "#{Time.now} running ... ...  "
-    cmd = "./proxied_download.rb #{url} 500 #{proxyfile}"
+    cmd = "./proxied_download.rb '#{url}' 500 #{proxyfile}"
     success = `#{cmd}`
     puts "done!"
 
