@@ -74,5 +74,5 @@ if $PROGRAM_NAME == __FILE__
     end
   end
 
-  puts "success #{success}"
+  puts "#{success} success out of #{total}"
 end
