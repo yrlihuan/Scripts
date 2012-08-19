@@ -22,7 +22,7 @@ if $PROGRAM_NAME == __FILE__
     file.close
     puts "done!"
 
-    puts "#{Time.now} retrieving download url: ...  "
+    print "#{Time.now} retrieving download url: ...  "
     cmd = %q{curl -s "http://app.91.com/Soft/iPhone/com.xingxinghui.game.musicguess-1.0.1-1.0.1.html" | grep "下载到电脑" | sed -n 's/^.*a href="\([^ ]*\)".*$/\1/p'}
     path = `#{cmd}`
     while path.length < 10
@@ -33,7 +33,7 @@ if $PROGRAM_NAME == __FILE__
     url = "http://app.91.com#{path}"
     puts "done!"
 
-    print "#{Time.now} running ... ...  "
+    puts "#{Time.now} running ... ...  "
     cmd = "./proxied_download.rb '#{url}' 100 #{proxyfile}"
     success = `#{cmd}`
     puts "done!"
