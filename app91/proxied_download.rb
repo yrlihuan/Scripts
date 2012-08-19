@@ -44,22 +44,32 @@ if $PROGRAM_NAME == __FILE__
       http = EventMachine::HttpRequest.new(url, connection_opts).get
       http.callback do |client|
         code = client.response_header.status.to_i
-        if code >= 200 and code < 300
+        if code >= 200 and code < 400
           success += 1
         else
           failed += 1
         end
 
         #puts "success: #{p} (#{i}/#{total}) length: #{client.response.length} code: #{code}"
-        sleep(rand * 10)
-        iter.next
+        sleep(rand * 2)
+
+        if i == total
+          EM.stop
+        else
+          iter.next
+        end
       end
 
       http.errback do |client|
         failed += 1
         #puts "failed: #{p} (#{i}/#{total} code: #{client.response_header.status})"
         sleep(rand * 2)
-        iter.next
+
+        if i == total
+          EM.stop
+        else
+          iter.next
+        end
       end
     end
   end

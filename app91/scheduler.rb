@@ -9,7 +9,7 @@ if $PROGRAM_NAME == __FILE__
     puts "#{Time.now} start round #{cnt}"
 
     print "#{Time.now} retrieving proxies: ...  "
-    cmd = 'curl -s "http://elite-proxies.blogspot.com/" | sed -n -e "/<pre/,/Original/ p" | sed -n "1,/Original/ p" | sed -n -e "/^[0-9][0-9.:]*$/ p"'
+    cmd = 'curl -s "http://elite-proxies.blogspot.com/" | sed -n -e "/<pre/,/Original/ p" | sed -n -e "/^[0-9][0-9.:]*$/ p"'
     proxyfile = "/tmp/#{Time.now.strftime('%y%m%d_%H%M%S')}.txt"
     s = `#{cmd}`
     while s.length < 10
@@ -34,7 +34,7 @@ if $PROGRAM_NAME == __FILE__
     puts "done!"
 
     print "#{Time.now} running ... ...  "
-    cmd = "./proxied_download.rb '#{url}' 500 #{proxyfile}"
+    cmd = "./proxied_download.rb '#{url}' 100 #{proxyfile}"
     success = `#{cmd}`
     puts "done!"
 
