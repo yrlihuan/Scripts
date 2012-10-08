@@ -43,9 +43,10 @@ if $PROGRAM_NAME == __FILE__
   # it's a dict. key is the path, value is a dict {'ip':visits}
   stats = {}
 
-  file_start = Time.parse '2000-01-01'
+  file_end = Time.parse '2000-01-01'
   logs.each do |f|
-    file_end = File.atime f
+    file_start = file_end
+    file_end = File.mtime f
 
     next if file_start > end_d or file_end < start_d
 
@@ -66,8 +67,6 @@ if $PROGRAM_NAME == __FILE__
       addr_stat[ip] = 0 unless addr_stat.key? ip
       addr_stat[ip] += 1
     end
-
-    file_start = file_end
   end
 
   puts "pv\tuv\taddress"
