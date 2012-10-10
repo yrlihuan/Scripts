@@ -33,7 +33,7 @@ class WeiboCrawler
       result = nil
       try_until_success {result = weibo_instance.users_show(params)}
 
-      yield result
+      yield result if result
     end
   end
 
@@ -45,6 +45,8 @@ class WeiboCrawler
 
       friends = nil
       try_until_success {friends = weibo_instance.statuses_friends(params)}
+
+      break unless friends
 
       friends['users'].each do |f|
         yield f
