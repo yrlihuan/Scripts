@@ -12,7 +12,7 @@ require "./weibo_ext"
 require "./crawler"
 
 def filter
-  uids = ARGF.map {|l| l}
+  uids = ARGF.map {|l| l.to_i}
 
   crawler = WeiboCrawler.new
   valid_users = []
