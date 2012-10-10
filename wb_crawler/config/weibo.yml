@@ -1,4 +1,4 @@
-liuxin:
+development:
   api_key: "5786724301"
   api_secret: "9a3cf0ce71f414328e5c75155a3ce498"
   database: "mysql://statusnet081:looamysqlroot@localhost/liuxin"

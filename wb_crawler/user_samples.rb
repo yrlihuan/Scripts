@@ -20,8 +20,6 @@ def random_select_users(cnt)
     end
   end
 
-  puts "#{tried} url tried"
-
   uids
 end
 

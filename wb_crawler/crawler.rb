@@ -2,13 +2,21 @@
 # encoding: utf-8
 
 require "rubygems"
-require "weibo"
 require "oauth"
 require "./access_dispatcher"
+require "./weibo"
 require "./weibo_ext"
 
 class WeiboCrawler
   def initialize
+  end
+
+  def users_show(user_ids)
+    user_ids.each do |uid|
+      params = {:user_id => uid}
+
+      yield weibo_instance.users_show(params)
+    end
   end
 
   def update_counts(ids)

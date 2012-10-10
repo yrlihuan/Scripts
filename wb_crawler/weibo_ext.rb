@@ -18,6 +18,10 @@ module Weibo
     def statuses_friends(query={})
       perform_get("/statuses/friends.json", :query => query)
     end
+
+    def users_show(query={})
+      perform_get("/users/show.json", :query => query)
+    end
   end
 end
 

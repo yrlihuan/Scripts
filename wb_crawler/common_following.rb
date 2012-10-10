@@ -1,17 +1,9 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 
-# hacks here: we don't want to add dependency on rails
-PROFILE = "liuxin"
-class Rails
-  def self.env
-    PROFILE
-  end
-end
-
 require "yaml"
-CONFIG = YAML.load_file('config/weibo.yml')[PROFILE]
-DBCONFIG = YAML.load_file('../site.yml')
+env = 'development'
+CONFIG = YAML.load_file('config/weibo.yml')[env]
 
 require "rubygems"
 require "./access_dispatcher"
@@ -21,15 +13,14 @@ require "sequel"
 require "time"
 
 def retrieve_followings
-  users = YAML.load_file('./users_all.yml')
+  users = ARGF.map {|l| l}
   crawler = WeiboCrawler.new
 
   count = {}
 
   pos = 0
-  users[0...4000].each do |u|
-    puts pos += 1
-    uid = u['login']
+  users.each do |u|
+    uid = u.to_i
     crawler.update_user_following(uid) do |f|
       fid = f["id"]
       name = f['screen_name']

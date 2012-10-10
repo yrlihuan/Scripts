@@ -4,14 +4,8 @@
 require "rubygems"
 
 require "yaml"
-PROFILE = "liuxin"
-class Rails
-  def self.env
-    PROFILE
-  end
-end
-
-CONFIG = YAML.load_file('config/weibo.yml')[PROFILE]
+env = 'development'
+CONFIG = YAML.load_file('config/weibo.yml')[env]
 
 require "./access_dispatcher"
 require "./weibo_ext"
