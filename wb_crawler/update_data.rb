@@ -11,16 +11,17 @@ end
 
 require "yaml"
 CONFIG = YAML.load_file('config/weibo.yml')[PROFILE]
+DBCONFIG = YAML.load_file('../site.yml')
+DBURL = "mysql://#{DBCONFIG['db_user']}:#{DBCONFIG['db_pass']}@localhost/#{DBCONFIG['products']['liuxin']['db']}"
 
 require "rubygems"
-require "weibo"
-require "oauth"
 require "./access_dispatcher"
 require "./weibo_ext"
+require "./crawler"
 require "sequel"
 require "time"
 
-DB = Sequel.connect(CONFIG['database'])
+DB = Sequel.connect(DBURL)
 
 DB.create_table? :wb_statuses do
   Bignum :id, :primary_key => true
@@ -39,104 +40,6 @@ DB.create_table? :wb_users do
   Integer :comment_count, :default => 0
   String :screen_name
   TrueClass :follower
-end
-
-class WeiboCrawler
-  def initialize
-  end
-
-  def update_user_timeline(user_id)
-    max_id = -1
-    while true
-      params = {:user_id => user_id, :count => 50}
-      if max_id > 0
-        params[:max_id] = max_id - 1
-      end
-
-      timeline = weibo_instance.user_timeline(params)
-
-      updated = 0
-      timeline.each do |status|
-        updated += yield status
-        max_id = status.id
-      end
-
-      break if updated == 0
-    end
-  end
-
-  def update_reposts(status_id)
-    page = 1
-    batch_start = Time.now
-    max_id = 0
-    while true
-      puts "reposts: page #{page}"
-      params = {:id => status_id, :count => 200, :page => page}
-      if max_id > 0
-        params[:max_id] = max_id
-      end
-
-      begin
-        reposts = weibo_instance.repost_timeline(params)
-
-        page += 1
-      rescue Exception => e
-        puts e
-        sleep 30
-        next
-      end
-
-      updated = 0
-      reposts.each do |repost|
-        updated += yield repost
-
-        if max_id == 0
-          max_id = repost.id
-        end
-      end
-
-      break if updated == 0
-    end
-  end
-
-  def update_status_comments(status_id)
-    page = 1
-    batch_start = Time.now
-    while true
-      puts "comments: page #{page}"
-      params = {:id => status_id, :count => 200, :page => page}
-
-      begin
-        comments = weibo_instance.comments(params)
-        # HACK: sina only allows to retrieve less than 500 records per minute
-        if page % 3 == 1 && page != 1
-          backoff_interval = batch_start - Time.now + 60.5
-          sleep(backoff_interval) if backoff_interval > 0
-          batch_start = Time.now
-        end
-
-        page += 1
-      rescue Exception => e
-        puts e
-        sleep 31
-        next
-      end
-
-      updated = 0
-      comments.each do |comment|
-        updated += yield comment
-      end
-
-      break if updated == 0
-    end
-  end
-
-  def weibo_instance
-    token, secret = AccessDispatcher.request_access
-    oauth = Weibo::OAuth.new(Weibo::Config.api_key, Weibo::Config.api_secret)
-    oauth.authorize_from_access(token, secret)
-    Weibo::Base.new(oauth)
-  end
 end
 
 def get_retweeters(status_id)
@@ -303,9 +206,9 @@ def is_source_from_ios(source)
 end
 
 if $PROGRAM_NAME == __FILE__
-  #update_user_timeline
+  update_user_timeline
   #update_comments
-  #update_reposts
-  get_retweeters("3412746022272885")
+  update_reposts
+  #get_retweeters("3412746022272885")
 end
 
