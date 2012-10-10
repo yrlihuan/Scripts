@@ -26,14 +26,45 @@ class WeiboCrawler
     end
   end
 
+  def user_timeline(user_id)
+    max_id = -1
+    batch_count = 50
+    while true
+      params = {:user_id => user_id, :count => batch_count}
+      if max_id > 0
+        params[:max_id] = max_id - 1
+      end
+
+      timeline = nil
+
+      try_until_success { timeline = weibo_instance.user_timeline(params) }
+
+      next unless timeline
+      break if timeline.count == 0
+
+      timeline.each do |status|
+        updated += yield status
+        max_id = status.id
+      end
+
+      break if updated != batch_count
+    end
+
+  end
+
   def users_show(user_ids)
     user_ids.each do |uid|
-      params = {:user_id => uid}
+      params = {:user_id => uid, :count => 1}
 
-      result = nil
-      try_until_success {result = weibo_instance.users_show(params)}
+      user = nil
+      try_until_success do
+        timeline = weibo_instance.user_timeline(params)
+        if timeline.count > 0
+          user = timeline[0]['user']
+        end
+      end
 
-      yield result if result
+      yield user if user
     end
   end
 

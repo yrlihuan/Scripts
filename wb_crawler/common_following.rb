@@ -9,7 +9,6 @@ require "rubygems"
 require "./access_dispatcher"
 require "./weibo_ext"
 require "./crawler"
-require "sequel"
 require "time"
 
 def retrieve_followings
