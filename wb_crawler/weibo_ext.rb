@@ -19,6 +19,10 @@ module Weibo
       perform_get("/statuses/friends.json", :query => query)
     end
 
+    def statuses_comments(query={})
+      perform_get("/statuses/comments.json", :query => query)
+    end
+
     def users_show(query={})
       perform_get("/users/show.json", :query => query)
     end

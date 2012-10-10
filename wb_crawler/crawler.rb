@@ -18,11 +18,32 @@ class WeiboCrawler
       begin
         yield
         success = true
-      rescue Exception => e
-        warn e
+      rescue Exception
+        warn $!
+        warn $@
         sleep 10
         retries += 1
       end
+    end
+  end
+
+  def statuses_comments(sid)
+    batch_count = 50
+    page = 1
+    while true
+      params = {:id => sid, :count => batch_count, :page => page}
+
+      comments = nil
+      try_until_success { comments = weibo_instance.statuses_comments(params) }
+
+      next unless comments
+
+      comments.each do |c|
+        yield c
+      end
+
+      page += 1
+      break if comments.count < batch_count
     end
   end
 
@@ -36,7 +57,6 @@ class WeiboCrawler
       end
 
       timeline = nil
-
       try_until_success { timeline = weibo_instance.user_timeline(params) }
 
       next unless timeline
