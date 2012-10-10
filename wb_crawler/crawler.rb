@@ -20,7 +20,7 @@ class WeiboCrawler
         success = true
       rescue Exception
         warn $!
-        warn $@
+        #warn $@
         sleep 10
         retries += 1
       end
