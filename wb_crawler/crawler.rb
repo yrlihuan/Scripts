@@ -11,15 +11,17 @@ class WeiboCrawler
   def initialize
   end
 
-  def try_until_success
+  def try_until_success(max_retry=10)
     success = false
-    until success
+    retries = 0
+    until success or retries >= max_retry
       begin
         yield
         success = true
       rescue Exception => e
         warn e
         sleep 10
+        retries += 1
       end
     end
   end
