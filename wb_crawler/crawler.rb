@@ -43,13 +43,10 @@ class WeiboCrawler
       break if timeline.count == 0
 
       timeline.each do |status|
-        updated += yield status
-        max_id = status.id
+        yield status
+        max_id = status['id']
       end
-
-      break if updated != batch_count
     end
-
   end
 
   def users_show(user_ids)
