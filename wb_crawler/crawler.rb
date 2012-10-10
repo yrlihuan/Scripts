@@ -11,20 +11,27 @@ class WeiboCrawler
   def initialize
   end
 
+  def try_until_success
+    success = false
+    until success
+      begin
+        yield
+        success = true
+      rescue Exception => e
+        warn e
+        sleep 10
+      end
+    end
+  end
+
   def users_show(user_ids)
     user_ids.each do |uid|
       params = {:user_id => uid}
 
-      success = false
-      until success
-        begin
-          yield weibo_instance.users_show(params)
-          success = true
-        rescue Exception => e
-          puts e
-          sleep 30
-        end
-      end
+      result = nil
+      try_until_success {result = weibo_instance.users_show(params)}
+
+      yield result
     end
   end
 
@@ -34,7 +41,8 @@ class WeiboCrawler
     while true
       params = {:user_id => user_id, :cursor => cursor, :count => count}
 
-      friends = weibo_instance.statuses_friends(params)
+      friends = nil
+      try_until_success {friends = weibo_instance.statuses_friends(params)}
 
       friends['users'].each do |f|
         yield f
