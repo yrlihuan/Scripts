@@ -43,6 +43,7 @@ class WeiboCrawler
       end
 
       page += 1
+      sleep 5
       break if comments.count < batch_count
     end
   end
