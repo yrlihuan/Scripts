@@ -11,11 +11,22 @@ require "./weibo_ext"
 require "./crawler"
 require "time"
 
+def compact_stat(stat_dic)
+  result = {}
+
+  stat_dic.each do |k, v|
+    result[k] = v if v > 1
+  end
+
+  result
+end
+
 def retrieve_followings
   users = ARGF.map {|l| l}
   crawler = WeiboCrawler.new
 
   count = {}
+  compact_thresh = 50000
 
   pos = 0
   users.each do |u|
@@ -27,11 +38,16 @@ def retrieve_followings
       count[key] = 0 unless count.include? key
 
       count[key] += 1
+
+      if count.count >= compact_thresh
+        count = compact_stat(count)
+        compact_thresh += count.count
+      end
     end
   end
 
   sorted = count.sort {|x,y| y[1] <=> x[1] }
-  sorted[0...500].each do |p|
+  sorted[0...5000].each do |p|
     name = p[0].split('&||&')[1]
     puts "#{p[1]}\t#{name}"
   end
