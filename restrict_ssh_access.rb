@@ -10,7 +10,7 @@ def block_ssh_access
 end
 
 def add_home_computer_to_white_list
-  hosts = ["hit.3322.org", "hthunder.tk"]
+  hosts = ["hit.3322.org", "hthunder.tk", "huannameserver.tk"]
 
   hosts.each do |h|
     homeip = `host #{h} | awk '{print $4}'`[0...-1]
