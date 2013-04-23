@@ -15,10 +15,14 @@ def block_ssh_access
 end
 
 def add_home_computer_to_white_list
-  hosts = ["hit.3322.org", "hthunder.tk", "eagle.hvps.tk", "mustang.hvps.tk"]
+  hosts = ["hit.3322.org", "thunder.hvps.tk", "eagle.hvps.tk", "mustang.hvps.tk", "192.168.1.0/24"]
 
   hosts.each do |h|
-    homeip = `host #{h} | awk '{print $4}'`[0...-1]
+    if h.start_with? '192'
+      homeip = h
+    else
+      homeip = `host #{h} | awk '{print $4}'`[0...-1]
+    end
 
     # skip if it's not an ip
     puts "not a valid ip: #{homeip}" if homeip.split('.').count != 4
