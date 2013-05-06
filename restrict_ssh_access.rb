@@ -15,7 +15,7 @@ def block_ssh_access
 end
 
 def add_home_computer_to_white_list
-  hosts = ["hit.3322.org", "thunder.hvps.tk", "huannameserver.tk", "mustang.hvps.tk", "192.168.1.0/24"]
+  hosts = ["hit.3322.org", "thunder.hvps.tk", "eagle.hvps.tk", "mustang.hvps.tk", "192.168.1.0/24"]
 
   hosts.each do |h|
     if h.start_with? '192'
