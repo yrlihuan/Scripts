@@ -33,5 +33,5 @@ while true
   print display
   $stdout.flush
 
-  sleep(.5)
+  sleep(0.5)
 end
