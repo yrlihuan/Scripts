@@ -21,7 +21,7 @@ def add_home_computer_to_white_list
     if h.start_with? '192'
       homeip = h
     else
-      homeip = `host #{h} | awk '{print $4}'`[0...-1]
+      homeip = `host #{h} | grep address | awk '{print $4}'`[0...-1]
     end
 
     # skip if it's not an ip
